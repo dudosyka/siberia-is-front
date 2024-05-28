@@ -120,10 +120,10 @@
               {{ localize("OperationsCapslock", "header") }}</MDBBtn
             >
             <MDBBtn
-                @click="goToOperationsByStock"
-                class="utility-btn upload-btn"
-                outline="black"
-            ><IconBorderAll color="black" :size="15" stroke-width="2" />
+              @click="goToOrdersByStock"
+              class="utility-btn upload-btn"
+              outline="black"
+              ><IconBorderAll color="black" :size="15" stroke-width="2" />
               {{ localize("sasha") }}</MDBBtn
             >
           </div>
@@ -180,7 +180,12 @@
 </template>
 
 <script lang="ts">
-import { IconMapPinFilled, IconRoute, IconUpload, IconBorderAll } from "@tabler/icons-vue";
+import {
+  IconMapPinFilled,
+  IconRoute,
+  IconUpload,
+  IconBorderAll,
+} from "@tabler/icons-vue";
 import { MDBBtn, MDBCol, MDBContainer, MDBInput, MDBRow } from "mdb-vue-ui-kit";
 import TableComponent from "@/components/Elements/Tables/TableComponent.vue";
 import SearchComponent from "@/components/Inputs/SearchComponent.vue";
@@ -230,7 +235,7 @@ export default {
     Toast,
     InputText,
     ProgressSpinner,
-    IconBorderAll
+    IconBorderAll,
   },
   props: {
     id: {
