@@ -12,9 +12,19 @@
         <label for="paidValue" class="ml-2"> {{ localize("isPaid") }} </label>
       </div>
     </MDBCol>
-    <MDBCol v-if="showDate" clsas="col-auto">
-      <DatePicker @change="handleDateChanged" />
+    <MDBCol v-if="showDate" class="col-auto">
+      <DatePicker class="date-picker" @change="handleDateChanged" />
     </MDBCol>
+    <MDBCol class="d-flex gap-2">
+    <MDBBtn class="utility-btn btn-black" @click="cancel">{{
+        localize("cancelCapslock", "default")
+      }}</MDBBtn>
+    <MDBBtn class="utility-btn btn-success" @click="save">{{
+        localize("saveCapslock", "default")
+      }}</MDBBtn>
+  </MDBCol>
+  </MDBRow>
+  <MDBRow class="d-flex flex-row flex-nowrap">
     <MDBCol class="col-auto">
       <SelectComponent
         :placeholder="placeholder"
@@ -42,14 +52,6 @@
     </MDBCol>
     <MDBCol class="col-auto">
       <MDBBtn class="utility-btn btn-black" @click="add">+</MDBBtn>
-    </MDBCol>
-    <MDBCol class="d-flex gap-2">
-      <MDBBtn class="utility-btn btn-black" @click="cancel">{{
-        localize("cancelCapslock", "default")
-      }}</MDBBtn>
-      <MDBBtn class="utility-btn btn-success" @click="save">{{
-        localize("saveCapslock", "default")
-      }}</MDBBtn>
     </MDBCol>
   </MDBRow>
   <SearchComponent @search="handleAddedSearch" />
@@ -319,5 +321,9 @@ export default {
 :deep(td.p-editable-column) {
   height: 40px !important;
   padding: 8px;
+}
+.date-picker {
+  width: 100%;
+  max-width: 10rem;
 }
 </style>
