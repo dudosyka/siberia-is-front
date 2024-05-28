@@ -17,6 +17,15 @@ export default class IncomeTransactionModel extends TransactionModel {
     );
   }
 
+  async processIncome(
+    transactionId: number,
+    productsDiff: TransactionProductItemDto[],
+  ) {
+    return await this.authorizedRequest(
+      new ApiRequestDto(`/${transactionId}/approve`, "PATCH", productsDiff),
+    );
+  }
+
   // async updateActualAmount(
   //   transactionId: number,
   //   productId: number,

@@ -42,6 +42,11 @@ export const useOperationStore = defineStore({
       else return [];
     },
     getStatusList: (state) => state.statusesList,
+    getStatusListLocalized: (state) =>
+      state.statusesList.map((el) => ({
+        id: el.id,
+        name: PrintUtil.localize(el.name, "operations"),
+      })),
     getProductsDataMapped: (state) => {
       const data = {};
       state.selectedOperation.products.forEach((el) => {
@@ -74,18 +79,12 @@ export const useOperationStore = defineStore({
       return selected;
     },
 
-    catchTransactionSocketUpdate(
-      transactionId: number,
-      transactionDto: TransactionDto,
-    ) {
+    catchTransactionSocketUpdate(transactionId: number, _: TransactionDto) {
       if (!this.selectedOperation || transactionId != this.selectedOperation.id)
         return;
 
       if (this.selectedOperation.id == transactionId) {
-        this.selectedOperation = {
-          ...transactionDto,
-        };
-        this.selectedOperationInitialProductsData = this.getProductsDataMapped;
+        this.loadSelectedOperation(this.selectedOperation.id);
       }
     },
 
@@ -104,7 +103,9 @@ export const useOperationStore = defineStore({
       );
     },
 
-    async partiallyReceived(): Promise<ApiResponseDto<any> | null> {
+    async receiveIncome(
+      partially: boolean = true,
+    ): Promise<ApiResponseDto<any> | null> {
       const incomeTransactionModel = new IncomeTransactionModel();
 
       const modifiedProductDataMapped = this.getProductsDataMapped;
@@ -125,10 +126,17 @@ export const useOperationStore = defineStore({
 
       if (foundNegativeDiff) return null;
 
-      return await incomeTransactionModel.partiallyReceive(
-        this.selectedOperation.id,
-        productsDiff,
-      );
+      if (partially) {
+        return await incomeTransactionModel.partiallyReceive(
+          this.selectedOperation.id,
+          productsDiff,
+        );
+      } else {
+        return await incomeTransactionModel.processIncome(
+          this.selectedOperation.id,
+          productsDiff,
+        );
+      }
     },
 
     async changeStatus(

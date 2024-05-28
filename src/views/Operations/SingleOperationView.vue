@@ -41,7 +41,6 @@
                   }}</span>
                   <SelectComponent
                     v-model="selectedStatus"
-                    @change="handleStatusChange"
                     :placeholder="statusPlaceholder"
                     :filter="false"
                     class="dropdown-wrapper"
@@ -49,7 +48,10 @@
                   />
                 </MDBRow>
               </MDBCol>
-              <MDBCol class="col-auto animate__animated animate__fadeIn" v-if="selectedStatusNeedStock">
+              <MDBCol
+                class="col-auto animate__animated animate__fadeIn"
+                v-if="selectedStatusNeedStock"
+              >
                 <MDBRow
                   class="flex-nowrap justify-center align-items-center mr-4"
                 >
@@ -91,7 +93,7 @@
             <span class="username">{{ isPaidString }}</span>
           </MDBCol>
         </MDBRow>
-        <template v-if="isStatusOnSelect">
+        <template v-if="canEditAmount">
           <p class="disclaimer animate__animated animate__fadeIn">
             <IconInfoCircle color="#b6b6b7" :size="16" stroke-width="2" />
             {{ localize("disclaimerText") }}
@@ -125,7 +127,7 @@
 <script lang="ts">
 import { MDBContainer, MDBRow, MDBCol, MDBBtn } from "mdb-vue-ui-kit";
 import TableComponent from "@/components/Elements/Tables/TableComponent.vue";
-import {IconInfoCircle} from "@tabler/icons-vue";
+import { IconInfoCircle } from "@tabler/icons-vue";
 import SearchComponent from "@/components/Inputs/SearchComponent.vue";
 import { useOperationStore } from "@/stores/operation.store";
 import { useRoute, useRouter } from "vue-router";
@@ -156,11 +158,11 @@ export default {
     MDBContainer,
     MDBCol,
     MDBBtn,
-    IconInfoCircle
+    IconInfoCircle,
   },
   props: {
     id: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
@@ -270,16 +272,28 @@ export default {
       await this.operationStore.updateActualAmount(row.id, row.actualAmount);
     },
     async changeToStatus(statusId: number) {
-      return await this.operationStore.changeStatus(this.id, statusId);
+      return await this.operationStore.changeStatus(
+        this.selectedOperation.id,
+        statusId,
+      );
     },
     async changeToStatusWithStock(statusId: number, stockId: number) {
-      return await this.operationStore.changeStatus(this.id, statusId, stockId);
+      return await this.operationStore.changeStatus(
+        this.selectedOperation.id,
+        statusId,
+        stockId,
+      );
     },
     toggleStatusChange() {
       this.isStatusOnSelect = !this.isStatusOnSelect;
-    },
-    handleStatusChange() {
-      loggerUtil.debug(this.selectedStatus);
+      if (this.isStatusOnSelect) {
+        const availableStatuses = this.selectedOperation.availableStatuses.map(
+          (el) => el.id,
+        );
+
+        if (availableStatuses.includes(this.selectedOperation.status.id))
+          this.selectedStatus = this.selectedOperation.status;
+      }
     },
     handleStorehouseChange() {},
     async saveStatus() {
@@ -308,6 +322,14 @@ export default {
       }
 
       if (this.selectedStatus) {
+        if (
+          this.canEditAmount &&
+          this.selectedStatus.id == TransactionStatus.PROCESSED
+        ) {
+          await this.processIncome();
+          return;
+        }
+
         if (this.partiallyReceivingInProgress) {
           await this.partialReceiving();
           return;
@@ -369,8 +391,35 @@ export default {
         });
       }
     },
+    async processIncome() {
+      const result = await this.operationStore.receiveIncome(false);
+
+      if (result == null) {
+        this.$toast.add({
+          severity: "error",
+          summary: this.localize("Failed"),
+          detail: this.localize("updateStatusError"),
+          life: 3000,
+        });
+        return;
+      }
+
+      if (result.success) {
+        this.$toast.add({
+          severity: "success",
+          summary: this.localize("success"),
+          detail: this.localize("statusUpdated"),
+          life: 3000,
+        });
+        const loadRes = await this.operationStore.loadOperationList();
+        loadRes.toastIfError(this.$toast, this.$nextTick);
+        this.toggleStatusChange();
+      } else {
+        result.toastIfError(this.$toast, this.$nextTick);
+      }
+    },
     async partialReceiving() {
-      const result = await this.operationStore.partiallyReceived();
+      const result = await this.operationStore.receiveIncome(true);
 
       if (result == null) {
         this.$toast.add({
@@ -405,7 +454,10 @@ export default {
     },
     selectedStatusNeedStock() {
       if (!this.selectedStatus) return false;
-      return this.selectedStatus.id == appConf.transferInProgressStatus;
+      return (
+        this.selectedStatus.id == appConf.transferInProgressStatus &&
+        this.selectedOperation.type.id == TransactionType.TRANSFER
+      );
     },
     statusPlaceholder() {
       return this.status;

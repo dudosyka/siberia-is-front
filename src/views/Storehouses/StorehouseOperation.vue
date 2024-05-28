@@ -272,7 +272,7 @@ export default {
           this.showErrorToast(this.localize("youMustSetArrivalDate"));
           return;
         }
-        this.isPaid = this.isPaid.length != 0;
+        if (this.isPaid !== false) this.isPaid = this.isPaid.length != 0;
         this.$emit("save", {
           isPaid: this.isPaid,
           date: this.date,
@@ -320,5 +320,4 @@ export default {
   height: 40px !important;
   padding: 8px;
 }
-
 </style>

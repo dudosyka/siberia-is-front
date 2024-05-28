@@ -191,7 +191,11 @@ import PrintUtil from "@/utils/localization/print.util";
 import { useModalStore } from "@/stores/modal.store";
 import ValidatorUtil from "@/utils/validator/validator.util";
 import ValidateRule from "@/utils/validator/validate-rule";
-import { appConf, TransactionStatus } from "@/api/conf/app.conf";
+import {
+  appConf,
+  TransactionStatus,
+  TransactionType,
+} from "@/api/conf/app.conf";
 import TokenUtil from "@/utils/token.util";
 import loggerUtil from "@/utils/logger/logger.util";
 import InputText from "primevue/inputtext";
@@ -375,7 +379,7 @@ export default {
       return this.saleAvailable;
     },
     isTransferAvailable() {
-      return this.requestAvailable && this.controlOperationsFromDesktop;
+      return this.requestAvailable; // && this.controlOperationsFromDesktop;
     },
     isWriteOffAvailable() {
       return this.writeOffAvailable;
@@ -606,6 +610,35 @@ export default {
       const selectedStockId = this.selectedStorehouse.id;
       const filtersStore = useFiltersStore();
       filtersStore.setDefaults({
+        to: [
+          {
+            id: selectedStockId,
+            name: this.selectedStorehouse.name,
+            address: this.selectedStorehouse.address,
+          },
+        ],
+        from: [
+          {
+            id: selectedStockId,
+            name: this.selectedStorehouse.name,
+            address: this.selectedStorehouse.address,
+          },
+        ],
+      });
+      this.router.push({
+        name: "Operations",
+      });
+    },
+    goToOrdersByStock() {
+      const selectedStockId = this.selectedStorehouse.id;
+      const filtersStore = useFiltersStore();
+      filtersStore.setDefaults({
+        type: [
+          {
+            id: TransactionType.INCOME,
+            name: PrintUtil.localize(TransactionType.INCOME, "operations"),
+          },
+        ],
         to: [
           {
             id: selectedStockId,

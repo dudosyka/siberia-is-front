@@ -93,7 +93,7 @@ export default {
       status: {
         title: PrintUtil.localize("operationStatus", "operations"),
         type: FilterType.SELECT,
-        items: this.operationStore.getStatusList,
+        items: this.operationStore.getStatusListLocalized,
         value: null,
       },
       type: {
