@@ -492,7 +492,8 @@ export default {
         return;
       }
 
-      this.productFormStore.data["photo"] = this.productFormStore.data.photo;
+      this.productFormStore.data["photoList"] =
+        this.productFormStore.data.photo;
 
       // this.productFormStore.data.professionalPercent = parseFloat(
       //   `${this.productFormStore.data.professionalPercent}`.replace(",", "."),

@@ -659,7 +659,8 @@ export default {
         "Event discarding failed, target was removed",
     },
     operations: {
-      disclaimerText: "If the number of any items differs from what was declared, change it in the list.",
+      disclaimerText:
+        "If the number of any items differs from what was declared, change it in the list.",
       Arrival: "Arrival",
       Sale: "Sale",
       Request: "Request",
@@ -741,6 +742,7 @@ export default {
       deleteSelected: "DELETE SELECTED",
       fileName: "FILE NAME",
       file: "File",
+      files: "Files",
       removedOne: "removed",
       removedSelected: "removed",
       updated: "updated",

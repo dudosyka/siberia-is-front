@@ -539,7 +539,7 @@ export default {
       return {
         actualAmount: (row) => {
           if (row.actualAmount == null) {
-            return row.amount;
+            return 0;
           } else {
             return row.actualAmount;
           }
@@ -587,8 +587,8 @@ export default {
   font-weight: 600 !important;
 }
 .qr {
-  width: 10rem;
-  height: 10rem;
+  width: 20rem;
+  height: 20rem;
 }
 .dropdown-wrapper {
   width: min-content;

@@ -230,6 +230,8 @@ export default {
     async removeImage(image) {
       const removeRes = await this.mediaStore.removeImage(image.id);
 
+      console.log(image);
+
       if (removeRes.success) {
         this.$toast.add({
           severity: "info",
